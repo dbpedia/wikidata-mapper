@@ -152,13 +152,10 @@ def get_properties_metadata(pids):
 
     for pids_group in grouper(pids, LIMIT):
         talk_pages = get_properties_talk_pages(pids_group)
-        data.update({
-            pid: {
-                'raw': page,
-                'meta': parse_property_talk_page(page),
-            }
-            for pid, page in talk_pages.iteritems()
-        })
+        for pid, page in talk_pages.viewitems():
+            meta = parse_property_talk_page(page)
+            meta['raw'] = page
+            data[pid] = meta
 
     return data
 
