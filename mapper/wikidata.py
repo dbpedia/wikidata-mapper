@@ -8,8 +8,10 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
+import rdflib
 import requests
 from mwparserfromhell import parse as wikiparse
+from rdflib.term import URIRef
 
 from .utils import grouper, retry
 
@@ -208,3 +210,23 @@ class Property(object):
             aliases = []
         aliases.append(self._data['info']['labels']['en'])
         return aliases
+
+
+def get_wikidata_class_ids(taxonomy_filename):
+    """
+    You can download taxonomy file here:
+    http://tools.wmflabs.org/wikidata-exports/rdf
+    """
+    g = rdflib.Graph()
+    taxonomy = g.parse(taxonomy_filename, format='nt')
+    classes = list(s.split('/')[-1] for (s, p, o) in taxonomy.triples(
+        (None, None, URIRef(u'http://www.w3.org/2002/07/owl#Class'))
+    ))
+    return [c for c in classes if c.startswith('Q')]
+
+
+def get_class_entities(taxonomy_filename):
+    # TODO? Download latest taxonomy dump, unzip it
+    class_ids = get_wikidata_class_ids(taxonomy_filename)
+    entities = get_entities(class_ids)
+    return entities
