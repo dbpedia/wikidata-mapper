@@ -14,17 +14,26 @@ from mapper.wikidata import (
 
 if __name__ == '__main__':
     pids = get_property_ids()
-    print('Got %d Properties.' % len(pids))
+    print('Got %d Property IDs.' % len(pids))
 
     entities = get_entities(pids)
     print('Got entities.')
+
+    obsolete_property_ids = []
+    for pid, entity in entities.viewitems():
+        if 'labels' in entity and 'OBSOLETE' in entity['labels']['en']:
+            obsolete_property_ids.append(pid)
+
+    for pid in obsolete_property_ids:
+        del entities[pid]
 
     metadata = get_properties_metadata(pids)
     print('Got metadata.')
 
     # Not every Property has metadata, so we merge into entities.
     for pid, meta in metadata.viewitems():
-        entities[pid]['meta'] = meta
+        if pid in entities:
+            entities[pid]['meta'] = meta
 
     now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M')
     filename = 'wikidata_properties_%s.pickle' % now
