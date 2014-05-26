@@ -4,7 +4,11 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
+
+import regex
+import string
 import time
+import unicodedata
 from itertools import izip_longest
 from functools import wraps
 
@@ -63,3 +67,24 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
         return f_retry  # true decorator
 
     return deco_retry
+
+
+def normalize(term):
+    """Normalize term strings for better matching.
+
+    - Lowercase;
+    - ASCII-folding;
+    - replace all non-word characters with  (whitespace);
+    - strip leading and trailing whitespaces;
+    - delete digits.
+
+    >>> normalize(u'Chéri, fais-moi peur (1958)')
+    u'cheri fais moi peur'
+    """
+
+    s = regex.sub(ur'[^\p{L}]+', ' ', term)
+    s = ''.join(
+        x for x in unicodedata.normalize('NFKD', s)
+        if x in string.ascii_letters + ' '
+    )
+    return str(' '.join(w for w in s.lower().strip().split()))
