@@ -2,3 +2,4 @@ mwparserfromhell==0.3.3
 requests==2.2.1
 rdflib==4.1.2
 regex==2014.05.23
+lxml==3.3.5
