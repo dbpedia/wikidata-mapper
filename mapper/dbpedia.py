@@ -60,5 +60,8 @@ def parse_entity(p):
     }
 
 
-def get_label(entity, language='en'):
-    return unicode(entity['data']['labels'][language])
+def get_labels(entity, language='en'):
+    try:
+        return [unicode(entity['data']['labels'][language])]
+    except KeyError:
+        return [unicode(entity['url'].split('/')[-1])]
