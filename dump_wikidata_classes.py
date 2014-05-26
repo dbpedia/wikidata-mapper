@@ -26,6 +26,9 @@ if __name__ == '__main__':
         )
     else:
         for entity in entities:
+            # Delete sitelinks
+            del entity['sitelinks']
+
             # Leave only english
             if 'aliases' in entity:
                 for language in entity['aliases'].keys():
