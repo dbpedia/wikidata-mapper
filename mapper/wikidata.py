@@ -208,20 +208,6 @@ def get_property_ids(limit=None):
     ]
 
 
-class Property(object):
-
-    def __init__(self, data):
-        self._data = data
-
-    def get_labels(self):
-        try:
-            aliases = self._data['info']['aliases']['en']
-        except KeyError:
-            aliases = []
-        aliases.append(self._data['info']['labels']['en'])
-        return aliases
-
-
 def get_wikidata_class_ids(taxonomy_filename):
     """
     You can download taxonomy file here:
@@ -239,3 +225,17 @@ def get_class_entities(taxonomy_filename):
     class_ids = get_wikidata_class_ids(taxonomy_filename)
     entities = get_entities(class_ids)
     return entities
+
+
+def get_labels(entity, language='en'):
+    try:
+        aliases = entity['aliases'][language]
+    except KeyError:
+        aliases = []
+
+    try:
+        aliases.append(entity['labels'][language])
+    except KeyError:
+        pass
+
+    return aliases
