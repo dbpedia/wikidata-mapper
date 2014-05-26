@@ -46,25 +46,30 @@ def get_entities(pids):
     pids - list of strings, ids of pages (e.g. ['P551', 'Q3376']).
     """
 
-    entities = {}
+    entities = []
 
-    for pids_group in grouper(pids, LIMIT):
+    for i, pids_group in enumerate(grouper(pids, LIMIT)):
         response = request('wbgetentities', ids=DELIMITER.join(pids_group))
-        entities.update(response['entities'])
+        entities.extend(response['entities'].viewvalues())
+        # TODO use logger
+        # TODO progress bar
+        entities_left = len(pids) - (i + 1) * LIMIT
+        if i % 10 == 0 and entities_left > 0:
+            print('%d entities to get' % entities_left)
 
     # Transform {key1: value1, ...} to [value1, ...] where it's appropriate.
-    for pid, info in entities.iteritems():
-        if 'aliases' in info:
-            for key, value in info['aliases'].iteritems():
-                info['aliases'][key] = [a['value'] for a in value]
+    for entity in entities:
+        if 'aliases' in entity:
+            for key, value in entity['aliases'].iteritems():
+                entity['aliases'][key] = [a['value'] for a in value]
 
-        if 'descriptions' in info:
-            for key, value in info['descriptions'].iteritems():
-                info['descriptions'][key] = value['value']
+        if 'descriptions' in entity:
+            for key, value in entity['descriptions'].iteritems():
+                entity['descriptions'][key] = value['value']
 
-        if 'labels' in info:
-            for key, value in info['labels'].iteritems():
-                info['labels'][key] = value['value']
+        if 'labels' in entity:
+            for key, value in entity['labels'].iteritems():
+                entity['labels'][key] = value['value']
 
     return entities
 
@@ -82,7 +87,7 @@ def get_properties_talk_pages(pids):
     def get_wikicode(page):
         return page['revisions'][0]['*']
 
-    for pids_group in grouper(pids, LIMIT):
+    for i, pids_group in enumerate(grouper(pids, LIMIT)):
         response = request(
             'query',
             prop='revisions',
@@ -102,6 +107,12 @@ def get_properties_talk_pages(pids):
             get_pid(p): get_wikicode(p)
             for p in pages
         })
+
+        # TODO use logger
+        # TODO progress bar
+        pages_left = len(pids) - (i + 1) * LIMIT
+        if i % 10 and pages_left > 0:
+            print('%d talk pages to get' % pages_left)
 
     return talk_pages
 
@@ -152,12 +163,11 @@ def get_properties_metadata(pids):
 
     data = {}
 
-    for pids_group in grouper(pids, LIMIT):
-        talk_pages = get_properties_talk_pages(pids_group)
-        for pid, page in talk_pages.viewitems():
-            meta = parse_property_talk_page(page)
-            meta['raw'] = page
-            data[pid] = meta
+    talk_pages = get_properties_talk_pages(pids)
+    for pid, page in talk_pages.viewitems():
+        meta = parse_property_talk_page(page)
+        meta['raw'] = page
+        data[pid] = meta
 
     return data
 
@@ -226,7 +236,6 @@ def get_wikidata_class_ids(taxonomy_filename):
 
 
 def get_class_entities(taxonomy_filename):
-    # TODO? Download latest taxonomy dump, unzip it
     class_ids = get_wikidata_class_ids(taxonomy_filename)
     entities = get_entities(class_ids)
     return entities
