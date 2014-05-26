@@ -74,7 +74,7 @@ def normalize(term):
 
     - Lowercase;
     - ASCII-folding;
-    - replace all non-word characters with  (whitespace);
+    - replace all non-word characters with whitespace symbol;
     - strip leading and trailing whitespaces;
     - delete digits.
 
