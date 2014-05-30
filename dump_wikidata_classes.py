@@ -4,19 +4,38 @@ from __future__ import (
     absolute_import, division, print_function, unicode_literals
 )
 
+import bz2
 import json
 import os
 from datetime import datetime
 
+import requests
+from lxml.html import fromstring as parse_html
+
 from mapper.wikidata import get_class_entities
 
 
-if __name__ == '__main__':
-    # TODO? Download latest taxonomy dump, unzip it
+TAXONOMY_FILENAME = 'wikidata-taxonomy.nt'
+EXPORTS_URL = 'http://tools.wmflabs.org/wikidata-exports/rdf/'
+TAXONOMY_URL_TEMPLATE = 'http://tools.wmflabs.org/wikidata-exports/rdf/{date}/wikidata-taxonomy.nt.bz2'
 
-    taxonomy_filename = 'wikidata-taxonomy.nt'
+
+if __name__ == '__main__':
+    if not os.path.exists(TAXONOMY_FILENAME):
+        # Download latest wikidata-taxonomy dump
+        html = parse_html(requests.get(EXPORTS_URL).text.encode('utf8'))
+        date_str = html.xpath('//td[@class="n"]/a')[-1].text
+        taxonomy_url = TAXONOMY_URL_TEMPLATE.format(date=date_str)
+        archive = requests.get(taxonomy_url).content
+        print('Fetched wikidata-taxonomy.nt.bz2 file')
+
+        # Unzip it
+        with open(TAXONOMY_FILENAME, 'wb') as f:
+            f.write(bz2.decompress(archive))
+        print('Unzipped taxonomy to wikidata-taxonomy.nt file')
+
     try:
-        entities = get_class_entities(taxonomy_filename)
+        entities = get_class_entities(TAXONOMY_FILENAME)
     except IOError as e:
         print(e)
         print(
