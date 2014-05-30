@@ -64,7 +64,7 @@ if __name__ == '__main__':
             if 'sitelinks' in entity:
                 for language in entity['sitelinks'].keys():
                     if language != 'enwiki':
-                        del entity['labels'][language]
+                        del entity['sitelinks'][language]
 
         now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M')
         filename = 'wikidata_classes_%s.json' % now
