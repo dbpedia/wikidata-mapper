@@ -9,7 +9,7 @@ from datetime import datetime
 from itertools import ifilterfalse
 
 from mapper.wikidata import (
-    get_property_ids, get_entities, get_properties_metadata
+    get_property_ids, get_entities, get_properties_metadata, get_labels
 )
 
 
@@ -61,4 +61,21 @@ if __name__ == '__main__':
         print(e)
     else:
         print('Dump is ready. Filename:')
+        print(filename)
+
+    minimal_dump = []
+    for entity in entities:
+        minimal_dump.append({
+            'title': entity['title'],
+            'labels': get_labels(entity)
+        })
+
+    filename = 'wikidata_properties_%s_minimal.json' % now
+    try:
+        with open(filename, 'wb') as f:
+            json.dump(minimal_dump, f)
+    except Exception as e:
+        print(e)
+    else:
+        print('Minimal dump is ready. Filename:')
         print(filename)
