@@ -44,6 +44,9 @@ if __name__ == '__main__':
             'to %s' % os.path.dirname(os.path.realpath(__file__))
         )
     else:
+        # Ignore missing Items
+        entities = [e for e in entities if 'missing' in e]
+
         # Leave only English
         for entity in entities:
             if 'aliases' in entity:
