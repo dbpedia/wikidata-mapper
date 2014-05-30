@@ -46,6 +46,7 @@ if __name__ == '__main__':
     else:
         # Leave only English
         for entity in entities:
+            # Leave only english
             if 'aliases' in entity:
                 for language in entity['aliases'].keys():
                     if language != 'en':
