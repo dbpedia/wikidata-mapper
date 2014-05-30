@@ -44,8 +44,8 @@ if __name__ == '__main__':
             'to %s' % os.path.dirname(os.path.realpath(__file__))
         )
     else:
+        # Leave only English
         for entity in entities:
-            # Leave only english
             if 'aliases' in entity:
                 for language in entity['aliases'].keys():
                     if language != 'en':
@@ -59,6 +59,11 @@ if __name__ == '__main__':
             if 'labels' in entity:
                 for language in entity['labels'].keys():
                     if language != 'en':
+                        del entity['labels'][language]
+
+            if 'sitelinks' in entity:
+                for language in entity['sitelinks'].keys():
+                    if language != 'enwiki':
                         del entity['labels'][language]
 
         now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M')
