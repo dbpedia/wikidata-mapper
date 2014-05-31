@@ -45,7 +45,7 @@ if __name__ == '__main__':
         )
     else:
         # Ignore missing Items
-        entities = [e for e in entities if 'missing' in e]
+        entities = [e for e in entities if 'missing' not in e]
 
         # Leave only English
         for entity in entities:
