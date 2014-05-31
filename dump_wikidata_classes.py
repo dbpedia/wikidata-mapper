@@ -12,7 +12,7 @@ from datetime import datetime
 import requests
 from lxml.html import fromstring as parse_html
 
-from mapper.wikidata import get_class_entities
+from mapper.wikidata import get_class_entities, get_labels
 
 
 TAXONOMY_FILENAME = 'wikidata-taxonomy.nt'
@@ -81,3 +81,23 @@ if __name__ == '__main__':
         else:
             print('Dump is ready. Filename:')
             print(filename)
+
+        minimal_dump = []
+        for entity in entities:
+            if 'title' in entity:
+                minimal_dump.append({
+                    'title': entity['title'],
+                    'labels': get_labels(entity),
+                })
+
+        filename = 'wikidata_classes_%s_minimal.json' % now
+        try:
+            with open(filename, 'wb') as f:
+                json.dump(minimal_dump, f)
+        except Exception as e:
+            print(e)
+        else:
+            print('Minimal dump is ready. Filename:')
+            print(filename)
+
+
