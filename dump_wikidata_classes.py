@@ -15,9 +15,11 @@ from lxml.html import fromstring as parse_html
 from mapper.wikidata import get_class_entities, get_labels
 
 DUMPS_PATH = 'dumps'
-TAXONOMY_FILEPATH = 'wikidata-exports/wikidata-taxonomy.nt'
-EXPORTS_URL = 'http://tools.wmflabs.org/wikidata-exports/rdf/'
-TAXONOMY_URL_TEMPLATE = 'http://tools.wmflabs.org/wikidata-exports/rdf/{date}/wikidata-taxonomy.nt.bz2'
+EXPORTS_PATH = 'wikidata-exports'
+TAXONOMY_FILENAME = 'wikidata-taxonomy.nt'
+TAXONOMY_FILEPATH = os.path.join(EXPORTS_PATH, TAXONOMY_FILENAME)
+EXPORTS_URL = 'http://tools.wmflabs.org/wikidata-exports/rdf'
+TAXONOMY_URL_TEMPLATE = EXPORTS_URL + '/{date}/wikidata-taxonomy.nt.bz2'
 
 
 def fetch_wikidata_taxonomy_dump():
@@ -28,10 +30,13 @@ def fetch_wikidata_taxonomy_dump():
     print('Downloading wikidata-taxonomy.nt.bz2 file.')
     archive = requests.get(taxonomy_url).content
 
+    if not os.path.exists(EXPORTS_PATH):
+        os.mkdir(EXPORTS_PATH)
+
     # Unzip it
     with open(TAXONOMY_FILEPATH, 'wb') as f:
         f.write(bz2.decompress(archive))
-    print('Unzipped taxonomy to %s file' % TAXONOMY_FILEPATH)
+    print('Unzipped taxonomy to %s file.' % TAXONOMY_FILEPATH)
 
 
 def make_filename(suffix=None):
@@ -61,6 +66,7 @@ def make_dump(json_data, filename, message):
 
 
 if __name__ == '__main__':
+    # TODO Check if we have latest taxonomy export
     if not os.path.exists(TAXONOMY_FILEPATH):
         fetch_wikidata_taxonomy_dump()
 
