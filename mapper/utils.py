@@ -87,4 +87,17 @@ def normalize(term):
         x for x in unicodedata.normalize('NFKD', s)
         if x in string.ascii_letters + ' '
     )
-    return str(' '.join(w for w in s.lower().strip().split()))
+    return ' '.join(w for w in s.lower().strip().split())
+
+
+def uncamelcase(s, delimiter=' '):
+    """Split CamelCase string, normalize it and return.
+
+    >>> uncamelcase(u'NCAATeamSeasonDBPedia')
+    u'ncaa team season db pedia'
+    """
+
+    s = regex.sub('(.)([A-Z][a-z]+)', r'\1%s\2' % delimiter, s)
+    s = regex.sub('([a-z0-9])([A-Z])', r'\1%s\2' % delimiter, s)
+
+    return normalize(s)
