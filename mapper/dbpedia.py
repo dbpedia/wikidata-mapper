@@ -6,6 +6,8 @@ from __future__ import (
 
 from lxml.etree import parse
 
+from mapper.utils import uncamelcase
+
 
 def parse_ontology(filename):
     with open(filename) as f:
@@ -61,7 +63,29 @@ def parse_entity(p):
 
 
 def get_labels(entity, language='en'):
+    """Return a list of two string if `language` is 'en',
+    where first one is a label and second is a uncamelcased title.
+    E.g., if title is 'RailwayStation' and label is 'train station'
+    return ['train station', 'railway station'].
+
+    For other languages return a list of one string (appropriate label).
+
+    If entity doesn't have appropriate language return list with one string
+    or empty list respectively.
+    """
+
+    labels = []
+
     try:
-        return [unicode(entity['data']['labels'][language])]
+        label = unicode(entity['data']['labels'][language])
+        labels.append(label)
     except KeyError:
-        return [unicode(entity['url'].split('/')[-1])]
+        label = None
+
+    if language == 'en':
+        title = uncamelcase(unicode(entity['url'].split('/')[-1]))
+        if label is not None and title != label.lower():
+            labels.append(uncamelcase(title))
+
+    return labels
+
