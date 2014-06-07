@@ -53,6 +53,13 @@ def make_dump(json_data, filename, message):
         print(filepath)
 
 
+def get_description(entity):
+    try:
+        return entity['data']['comments']['en']
+    except KeyError:
+        return ''
+
+
 if __name__ == '__main__':
     if not os.path.exists(ONTOLOGY_FILEPATH):
         fetch_ontology()
@@ -60,7 +67,11 @@ if __name__ == '__main__':
     ontology = parse_ontology(ONTOLOGY_FILEPATH)
 
     classes = [
-        {'title': c['url'].split('/')[-1], 'labels': get_labels(c)}
+        {
+            'title': c['url'].split('/')[-1],
+            'labels': get_labels(c),
+            'description': get_description(c),
+        }
         for c in ontology['classes']
     ]
     make_dump(
@@ -71,7 +82,11 @@ if __name__ == '__main__':
 
     properties = ontology['object_properties'] + ontology['datatype_properties']
     properties = [
-        {'title': p['url'].split('/')[-1], 'labels': get_labels(p)}
+        {
+            'title': p['url'].split('/')[-1],
+            'labels': get_labels(p),
+            'description': get_description(p),
+        }
         for p in properties
     ]
     make_dump(

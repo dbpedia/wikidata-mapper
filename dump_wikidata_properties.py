@@ -91,9 +91,15 @@ if __name__ == '__main__':
     # Prepare data for minimal dump.
     minimal_entities = []
     for entity in entities:
+        try:
+            desc = entity['descriptions']['en']
+        except KeyError:
+            desc = ''
+
         minimal_entities.append({
             'title': entity['title'],
             'labels': get_labels(entity),
+            'description': desc,
         })
 
     # Dump {'title': ..., 'labels': [...]} structure.
