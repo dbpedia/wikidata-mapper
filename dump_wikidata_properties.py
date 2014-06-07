@@ -6,7 +6,6 @@ from __future__ import (
 
 import json
 import os
-from datetime import datetime
 from itertools import ifilterfalse
 
 from mapper.wikidata import (
@@ -20,13 +19,8 @@ def is_obsolete(entity):
     return 'labels' in entity and 'OBSOLETE' in entity['labels']['en']
 
 
-def make_filename(suffix=None):
-    now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M')
-    filename_template = 'wikidata_properties_{datetime}{suffix}.json'
-    return filename_template.format(
-        datetime=now,
-        suffix='' if suffix is None else ('_' + suffix),
-    )
+def make_filename(suffix):
+    return 'wikidata_properties_%s.json' % suffix
 
 
 def make_dump(json_data, filename, message):
@@ -65,7 +59,8 @@ if __name__ == '__main__':
             entity['meta'] = metadata[entity['id']]
 
     # Dump all languages.
-    make_dump(entities, make_filename(), 'Full dump is ready. Filename:')
+    filename = make_filename('full')
+    make_dump(entities, filename, 'Full dump is ready. Filename:')
 
     # Prepare data for English dump.
     for entity in entities:
@@ -103,5 +98,5 @@ if __name__ == '__main__':
         })
 
     # Dump {'title': ..., 'labels': [...]} structure.
-    filename = make_filename('minimal')
+    filename = make_filename('minimal_en')
     make_dump(minimal_entities, filename, 'Minimal dump is ready. Filename:')

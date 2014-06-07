@@ -7,7 +7,6 @@ from __future__ import (
 import bz2
 import json
 import os
-from datetime import datetime
 
 import requests
 from lxml.html import fromstring as parse_html
@@ -39,13 +38,8 @@ def fetch_wikidata_taxonomy_dump():
     print('Unzipped taxonomy to %s file.' % TAXONOMY_FILEPATH)
 
 
-def make_filename(suffix=None):
-    now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M')
-    filename_template = 'wikidata_classes_{datetime}{suffix}.json'
-    return filename_template.format(
-        datetime=now,
-        suffix='' if suffix is None else ('_' + suffix),
-    )
+def make_filename(suffix):
+    return 'wikidata_classes_%s.json' % suffix
 
 
 def make_dump(json_data, filename, message):
@@ -77,7 +71,7 @@ if __name__ == '__main__':
     entities = [e for e in entities if 'missing' not in e]
 
     # Dump all languages.
-    filename = make_filename()
+    filename = make_filename('full')
     make_dump(entities, filename, 'Full dump is ready. Filename:')
 
     # Prepare data for English dump.
@@ -120,7 +114,7 @@ if __name__ == '__main__':
                 'description': desc,
             })
 
-    filename = make_filename('minimal')
+    filename = make_filename('minimal_en')
     make_dump(
         minimal_entities,
         filename,
