@@ -15,8 +15,7 @@ import requests
 from mapper.dbpedia import parse_ontology, get_labels
 
 
-# TODO get latest version
-ONTOLOGY_URL = 'http://downloads.dbpedia.org/3.9/dbpedia_3.9.owl.bz2'
+ONTOLOGY_URL = 'http://mappings.dbpedia.org/server/ontology/dbpedia.owl'
 EXPORTS_PATH = 'dbpedia-exports'
 ONTOLOGY_FILENAME = 'dbpedia.owl'
 ONTOLOGY_FILEPATH = os.path.join(EXPORTS_PATH, ONTOLOGY_FILENAME)
@@ -25,15 +24,15 @@ DUMPS_PATH = 'dumps'
 
 def fetch_ontology():
     print('Downloading %s file.' % ONTOLOGY_URL)
-    archive = requests.get(ONTOLOGY_URL).content
+    content = requests.get(ONTOLOGY_URL).content
 
     if not os.path.exists(EXPORTS_PATH):
         os.mkdir(EXPORTS_PATH)
 
-    # Unzip it
     with open(ONTOLOGY_FILEPATH, 'wb') as f:
-        f.write(bz2.decompress(archive))
-    print('Unzipped DBPedia ontology to %s file.' % ONTOLOGY_FILEPATH)
+        f.write(content)
+
+    print('Saved DBPedia ontology to %s file.' % ONTOLOGY_FILEPATH)
 
 
 def make_dump(json_data, filename, message):
