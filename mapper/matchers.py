@@ -8,12 +8,10 @@ import itertools
 
 import Levenshtein
 
-from mapper.utils import normalize
-
 
 def exact_label(d_entity, w_entity):
-    d_labels = [normalize(l) for l in d_entity['labels']]
-    w_labels = [normalize(l) for l in w_entity['labels']]
+    d_labels = d_entity['labels']
+    w_labels = w_entity['labels']
 
     return 1 if any(d_label in w_labels for d_label in d_labels) else 0
 
@@ -27,11 +25,11 @@ def levenshtein(d_entity, w_entity):
     and return maximum value.
     """
 
-    d_labels = [normalize(l) for l in d_entity['labels']]
+    d_labels = d_entity['labels']
     if not d_labels:
         return 0.0
 
-    w_labels = [normalize(l) for l in w_entity['labels']]
+    w_labels = w_entity['labels']
     if not w_labels:
         return 0.0
 
